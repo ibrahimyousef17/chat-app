@@ -13,4 +13,10 @@ class AuthRepositoryImpl implements AuthRepository{
     var either =  await authRemoteDataSource.register(email, password);
     return either ;
   }
+
+  @override
+  Future<Either<Failures, User?>> login(String email, String password)async {
+    var either =  await authRemoteDataSource.login(email, password);
+    return either ;
+  }
 }

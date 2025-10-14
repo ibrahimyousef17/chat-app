@@ -12,4 +12,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource{
     var either = await firebaseUtils.register(email, password);
     return either ;
   }
+
+  @override
+  Future<Either<Failures, User?>> login(String email, String password) async{
+    var either = await firebaseUtils.login(email, password);
+    return either ;
+  }
 }

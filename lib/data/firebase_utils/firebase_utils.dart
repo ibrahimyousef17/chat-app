@@ -12,7 +12,8 @@ class FirebaseUtils{
   }
   Future<Either<Failures,User?>> register(String email , String password)async{
     var connectivityResult = await Connectivity().checkConnectivity();
-    if(connectivityResult==ConnectivityResult.mobile||connectivityResult==ConnectivityResult.mobile){
+    if(connectivityResult==ConnectivityResult.mobile||connectivityResult==ConnectivityResult.wifi){
+      //todo have internet
       try {
         final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
@@ -33,6 +34,42 @@ class FirebaseUtils{
 
       }
     }
+    //todo no internet
+      return Left(NetworkError(errorMessage: 'Please check your internet'));
+  }
+
+
+  Future<Either<Failures,User?>> login(String email , String password)async{
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if(connectivityResult==ConnectivityResult.mobile||connectivityResult==ConnectivityResult.wifi) {
+      //todo have internet
+      try {
+        final credential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+            email: email,
+            password: password
+        );
+        return Right(credential.user);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          print('No user found for that email.');
+          return Left(
+              ServerError(errorMessage: 'No user found for that email.'));
+        } else if (e.code == 'wrong-password') {
+          print('Wrong password provided for that user.');
+          return Left(ServerError(
+              errorMessage: 'Wrong password provided for that user.'));
+        } else if (e.code=='invalid-credential'){
+          print('invalid-credential');
+          return Left(ServerError(
+              errorMessage: 'email or password not invalid'));
+        }
+      } catch (e) {
+        print(e.toString());
+        return Left(ServerError(errorMessage: e.toString()));
+      }
+    }
+    //todo no internet
       return Left(NetworkError(errorMessage: 'Please check your internet'));
   }
 }
