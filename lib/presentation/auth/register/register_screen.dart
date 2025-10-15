@@ -1,5 +1,6 @@
 import 'package:chat_app/domain/di.dart';
 import 'package:chat_app/presentation/auth/register/cubit/register_state.dart';
+import 'package:chat_app/presentation/home/home_screen.dart';
 import 'package:chat_app/presentation/utils/app_assets.dart';
 import 'package:chat_app/presentation/utils/app_theme.dart';
 import 'package:chat_app/presentation/utils/dialog_utils.dart';
@@ -44,7 +45,9 @@ class RegisterScreen extends StatelessWidget {
                   DialogUtils.showMessage(context: context, title: 'Error', message: state.errorMessage,barrierDismissible: false,posActionName: 'ok',);
                 }else{
                   DialogUtils.hideLoading(context);
-                  DialogUtils.showMessage(context: context, title: 'Success', message: "register successfully",barrierDismissible: false,posActionName: 'ok',);
+                  DialogUtils.showMessage(context: context, title: 'Success', message: "register successfully",barrierDismissible: false,posActionName: 'ok',posActon: (){
+                    Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+                  });
     }},
               child: Padding(
                 padding: EdgeInsets.all(20.h),

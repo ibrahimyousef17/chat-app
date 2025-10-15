@@ -18,9 +18,9 @@ class RegisterViewModel extends Cubit<RegisterStates>{
 
 register()async{
   emit(RegisterLoadingState(loadingMessage: 'Loading....'));
-  var either =await  registerUseCase.invoke(emailController.text, passwordController.text);
-  either?.fold(
+  var either =await  registerUseCase.invoke(emailController.text, passwordController.text,userNameController.text);
+  either.fold(
           (l) => emit(RegisterErrorState(errorMessage: l.errorMessage)),
-          (r) => emit(RegisterSuccessState()));
+          (r) => emit(RegisterSuccessState(userEntity: r)));
 }
 }

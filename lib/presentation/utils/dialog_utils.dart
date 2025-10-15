@@ -29,11 +29,12 @@ class DialogUtils {
     if(posActionName!=null){
       action.add(ElevatedButton(
           onPressed: (){
+            Navigator.of(context).pop();
             if(posActon!=null){
-              posActon ;
-            }else{
-              Navigator.of(context).pop();
+              posActon.call() ;
             }
+
+
           },
           child: Text(posActionName,style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontSize: 18.sp
@@ -42,10 +43,9 @@ class DialogUtils {
     if(negActionName!=null){
       action.add(ElevatedButton(
           onPressed: (){
+            Navigator.of(context).pop();
             if(negAction!=null){
-              negAction ;
-            }else{
-              Navigator.of(context).pop();
+              negAction.call() ;
             }
           },
           child: Text(negActionName,style: Theme.of(context).textTheme.titleMedium?.copyWith(

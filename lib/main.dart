@@ -1,19 +1,28 @@
 import 'package:bloc/bloc.dart';
+import 'package:chat_app/data/database/shared_prefs/shared_prefs.dart';
+import 'package:chat_app/domain/di.dart';
+import 'package:chat_app/presentation/auth/cubit/auth_cubit.dart';
 import 'package:chat_app/presentation/auth/login/login_screen.dart';
 import 'package:chat_app/presentation/auth/register/register_screen.dart';
-import 'package:chat_app/presentation/splash_screen/splash_screen.dart';
+import 'package:chat_app/presentation/home/home_screen.dart';
+import 'package:chat_app/presentation/splash/splash_screen.dart';
 import 'package:chat_app/presentation/utils/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'presentation/utils/my_bloc_observer.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await SharedPrefUtils.init();
   Bloc.observer = MyBlocObserver();
-  runApp(const MyApp());
+  runApp(BlocProvider(
+    create: (context) => AuthViewModel(logoutUseCase: injectLogoutUseCase()),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -34,6 +43,7 @@ class MyApp extends StatelessWidget {
             SplashScreen.routeName: (context) => SplashScreen(),
             LoginScreen.routeName: (context) => LoginScreen(),
             RegisterScreen.routeName: (context) => RegisterScreen(),
+            HomeScreen.routeName: (context) => HomeScreen(),
           },
         );
       },

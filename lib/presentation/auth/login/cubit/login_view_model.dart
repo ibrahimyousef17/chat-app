@@ -18,7 +18,7 @@ login() async {
   var either =await  loginUseCase.invoke(emailController.text, passwordController.text);
   either?.fold(
           (l) => emit(LoginErrorState(errorMessage: l.errorMessage)),
-          (r) => emit(LoginSuccessState()));
+          (r) => emit(LoginSuccessState(userEntity: r)));
 }
 
 }
