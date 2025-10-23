@@ -4,10 +4,14 @@ import 'package:chat_app/domain/di.dart';
 import 'package:chat_app/presentation/auth/cubit/auth_cubit.dart';
 import 'package:chat_app/presentation/auth/login/login_screen.dart';
 import 'package:chat_app/presentation/auth/register/register_screen.dart';
+import 'package:chat_app/presentation/chat/chat_screen.dart';
 import 'package:chat_app/presentation/home/home_screen.dart';
+import 'package:chat_app/presentation/room/room_screen.dart';
 import 'package:chat_app/presentation/splash/splash_screen.dart';
 import 'package:chat_app/presentation/utils/app_theme.dart';
+import 'package:chat_app/presentation/utils/fcm.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,6 +22,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await SharedPrefUtils.init();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await FCMService.init();
   Bloc.observer = MyBlocObserver();
   runApp(BlocProvider(
     create: (context) => AuthViewModel(logoutUseCase: injectLogoutUseCase()),
@@ -31,7 +37,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(360, 690),
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
@@ -44,6 +50,8 @@ class MyApp extends StatelessWidget {
             LoginScreen.routeName: (context) => LoginScreen(),
             RegisterScreen.routeName: (context) => RegisterScreen(),
             HomeScreen.routeName: (context) => HomeScreen(),
+            RoomScreen.routeName: (context) => RoomScreen(),
+            ChatScreen.routeName: (context) => ChatScreen(),
           },
         );
       },

@@ -1,3 +1,5 @@
+import 'package:chat_app/data/model/messageDto.dart';
+import 'package:chat_app/data/model/roomDto.dart';
 import 'package:chat_app/data/model/userDto.dart';
 import 'package:chat_app/domain/entity/failures.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -103,4 +105,77 @@ class FirebaseUtils{
      var querySnapshot = await getUserCollection().doc(userId).get();
      return querySnapshot.data();
  }
+
+ CollectionReference<RoomDto> roomCollection(){
+  return FirebaseFirestore.instance.collection(RoomDto.collectionName).withConverter<RoomDto>(
+        fromFirestore: (snapshot,options)=>RoomDto.fromJson(snapshot.data()),
+        toFirestore: (roomDto,_)=>roomDto.toJson());
+ }
+
+ Future<Either<Failures,void>> addRoomToFireStore(RoomDto room,String uid) async {
+   var connectivityResult = await Connectivity().checkConnectivity();
+   if (connectivityResult == ConnectivityResult.mobile ||
+       connectivityResult == ConnectivityResult.wifi) {
+     try{
+       var roomDocument = roomCollection().doc();
+       room.id = roomDocument.id;
+       return Right(roomDocument.set(room));
+     }catch(e){
+       return Left(ServerError(errorMessage: 'someThing went wrong'));
+     }
+   }else{
+     return Left(NetworkError(errorMessage: 'please check your internet'));
+   }
+ }
+
+ Future<Either<Failures, Stream<QuerySnapshot<RoomDto>>>> getRooms(String uid)async{
+   var connectivityResult = await Connectivity().checkConnectivity();
+   if (connectivityResult == ConnectivityResult.mobile ||
+       connectivityResult == ConnectivityResult.wifi) {
+     try{
+       return Right(roomCollection().snapshots());
+     }catch(e){
+       return Left(ServerError(errorMessage: 'someThing went wrong'));
+     }
+   }else{
+     return Left(NetworkError(errorMessage: 'please check your internet'));
+   }
+ }
+
+ CollectionReference<MessageDto> messageCollection(String roomId){
+   return roomCollection().doc(roomId).collection(MessageDto.collectionName).withConverter<MessageDto>
+      (fromFirestore: (snapshot,options)=>MessageDto.fromJson(snapshot.data()),
+        toFirestore: (messageDto,_)=>messageDto.toJson());
+
+ }
+
+ Future<Either<Failures,void>> sendMessage(MessageDto messageDto) async {
+   var connectivityResult = await Connectivity().checkConnectivity();
+   if (connectivityResult == ConnectivityResult.mobile ||
+       connectivityResult == ConnectivityResult.wifi) {
+     try{
+       var messageDocument = messageCollection(messageDto.roomId).doc();
+       messageDto.id = messageDocument.id;
+       return Right(messageDocument.set(messageDto));
+     }catch(e){
+       return Left(ServerError(errorMessage: 'someThing went wrong'));
+     }
+   }else{
+     return Left(NetworkError(errorMessage: 'please check your internet'));
+   }
+ }
+
+  Future<Either<Failures, Stream<QuerySnapshot<MessageDto>>>> receiveMessages(String roomId)async{
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      try{
+        return Right(messageCollection(roomId).orderBy('dateTime').snapshots());
+      }catch(e){
+        return Left(ServerError(errorMessage: 'someThing went wrong'));
+      }
+    }else{
+      return Left(NetworkError(errorMessage: 'please check your internet'));
+    }
+  }
 }
